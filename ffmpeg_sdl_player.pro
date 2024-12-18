@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        audiooutput.cpp \
         avframequeue.cpp \
         avpacketqueue.cpp \
         decodethread.cpp \
@@ -12,7 +13,9 @@ SOURCES += \
         main.cpp
 
 win32 {
-INCLUDEPATH += $$PWD/ffmpeg-4.2.1-win32-dev/include
+INCLUDEPATH += $$PWD/ffmpeg-4.2.1-win32-dev/include   \
+               $$PWD/SDL2-2.0.10/include
+
 LIBS += $$PWD/ffmpeg-4.2.1-win32-dev/lib/avformat.lib   \
         $$PWD/ffmpeg-4.2.1-win32-dev/lib/avcodec.lib    \
         $$PWD/ffmpeg-4.2.1-win32-dev/lib/avdevice.lib   \
@@ -21,9 +24,13 @@ LIBS += $$PWD/ffmpeg-4.2.1-win32-dev/lib/avformat.lib   \
         $$PWD/ffmpeg-4.2.1-win32-dev/lib/postproc.lib   \
         $$PWD/ffmpeg-4.2.1-win32-dev/lib/swresample.lib \
         $$PWD/ffmpeg-4.2.1-win32-dev/lib/swscale.lib
+
+LIBS += $$PWD/SDL2-2.0.10/lib/x86/SDL2.lib
+
 }
 
 HEADERS += \
+    audiooutput.h \
     avframequeue.h \
     avpacketqueue.h \
     decodethread.h \

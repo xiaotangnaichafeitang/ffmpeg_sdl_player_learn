@@ -34,8 +34,8 @@ public:
     int Stop();
     void Run();
 
-    AVCodecParameters *AudioCodeParameters();
-    AVCodecParameters *VideoCodeParameters();
+    AVCodecParameters *AudioCodecParameters();
+    AVCodecParameters *VideoCodecParameters();
 
 private:
     char err2str[256] = {0};

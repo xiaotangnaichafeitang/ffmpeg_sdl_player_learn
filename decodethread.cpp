@@ -44,7 +44,7 @@ int DecodeThread::Init(AVCodecParameters *par)
     int ret = avcodec_parameters_to_context(codec_ctx_, par);
     if(ret < 0) {
         av_strerror(ret, err2str, sizeof(err2str));
-        LogError("avformat_open_input failed, ret:%d, err2str:%s", ret, err2str);
+        LogError("avcodec_parameters_to_context failed, ret:%d, err2str:%s", ret, err2str);
         return -1;
     }
 
@@ -85,20 +85,22 @@ void DecodeThread::Run()
 {
     AVFrame *frame = av_frame_alloc();
 
-    LogInfo(" DecodeThread::Run info");
-
-    while(abort_ != 1){
-        if(frame_queue_->Size() > 10 ){
+    LogInfo("DecodeThread::Run info");
+    while (abort_ !=1 ) {
+        if(frame_queue_->Size() > 10) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
 
         AVPacket *pkt = packet_queue_->Pop(10);
-        if(pkt){
-            int ret = avcodec_send_packet(codec_ctx_,pkt);
-            if(ret < 0 ){
-                av_strerror(ret,err2str,sizeof (err2str));
-                LogError("avcodec_send_packet(codec_ctx_,pkt) failed,ret:%d,err2str:%s",ret,err2str);
-                break;//严重错误，直接跳出循环，不再尝试获取bao
+        if(pkt) {
+            int ret = avcodec_send_packet(codec_ctx_, pkt);
+            av_packet_free(&pkt);
+            LogInfo("ret = %d", ret);
+            if(ret < 0) {
+                av_strerror(ret, err2str, sizeof(err2str));
+                LogError("avcodec_send_packet failed, ret:%d, err2str:%s", ret, err2str);
+                break;
             }
             // 读取解码后的frame
             while(true){

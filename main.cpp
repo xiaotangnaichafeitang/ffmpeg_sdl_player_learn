@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 
     AVFrameQueue audio_frame_queue;
     AVFrameQueue video_frame_queue;
+
     //1 .解复用
     DemuxThread *demux_thread = new DemuxThread(&audio_packet_queue, &video_packet_queue);
     ret = demux_thread->Init(argv[1]);
@@ -40,9 +41,11 @@ int main(int argc, char *argv[])
         LogError("demux_thread.Start() failed");
         return -1;
     }
-    //解码线程初始化
-    DecodeThread *audio_decode_thread = new DecodeThread(&audio_packet_queue, &audio_frame_queue );
-    ret = audio_decode_thread->Init(demux_thread->AudioCodeParameters());
+
+    // 解码线程初始化
+    DecodeThread *audio_decode_thread = new DecodeThread(&audio_packet_queue, &audio_frame_queue);
+
+    ret = audio_decode_thread->Init(demux_thread->AudioCodecParameters());
     if(ret < 0) {
         LogError("audio_decode_thread->Init failed");
         return -1;
@@ -53,20 +56,21 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    DecodeThread *video_decode_thread = new DecodeThread(&video_packet_queue, &video_frame_queue );
-    ret = video_decode_thread->Init(demux_thread->VideoCodeParameters());
+    DecodeThread *video_decode_thread = new DecodeThread(&video_packet_queue, &video_frame_queue);
+
+    ret = video_decode_thread->Init(demux_thread->VideoCodecParameters());
     if(ret < 0) {
-        LogError("audio_decode_thread->Init failed");
+        LogError("video_decode_thread->Init() failed");
         return -1;
     }
     ret = video_decode_thread->Start();
     if(ret < 0) {
-        LogError("audio_decode_thread->Start failed");
+        LogError("video_decode_thread->Start() failed");
         return -1;
     }
 
     // 休眠2秒
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
 
     LogInfo("demux_thread->Stop");
     demux_thread->Stop();
@@ -77,6 +81,11 @@ int main(int argc, char *argv[])
     audio_decode_thread->Stop();
     LogInfo("delete audio_decode_thread");
     delete audio_decode_thread;
+
+    LogInfo("video_decode_thread->Stop()");
+    video_decode_thread->Stop();
+    LogInfo("delete video_decode_thread");
+    delete video_decode_thread;
 
     LogInfo("main finish");
 

@@ -82,6 +82,12 @@ void DemuxThread::Run()
     AVPacket pkt;
 
     while (abort_ != 1) {
+
+        if(audio_queue_->Size() > 100 || video_queue_->Size() > 100) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            continue;
+        }
+
         ret = av_read_frame(ifmt_ctx_, &pkt);
         if(ret < 0) {
             av_strerror(ret, err2str, sizeof(err2str));
@@ -101,7 +107,7 @@ void DemuxThread::Run()
     LogInfo("Run finish");
 }
 
-AVCodecParameters *DemuxThread::AudioCodeParameters()
+AVCodecParameters *DemuxThread::AudioCodecParameters()
 {
     if(audio_index_ != -1){
         return ifmt_ctx_->streams[audio_index_]->codecpar;
@@ -110,7 +116,7 @@ AVCodecParameters *DemuxThread::AudioCodeParameters()
     }
 }
 
-AVCodecParameters *DemuxThread::VideoCodeParameters()
+AVCodecParameters *DemuxThread::VideoCodecParameters()
 {
     if(video_index_ != -1){
        return ifmt_ctx_->streams[video_index_]->codecpar;

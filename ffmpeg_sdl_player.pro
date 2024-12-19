@@ -13,7 +13,8 @@ SOURCES += \
         decodethread.cpp \
         demuxthread.cpp \
         log.cpp \
-        main.cpp
+        main.cpp \
+        videooutput.cpp
 
 win32 {
 INCLUDEPATH += $$PWD/ffmpeg-4.2.1-win32-dev/include   \
@@ -40,4 +41,5 @@ HEADERS += \
     demuxthread.h \
     log.h \
     queue.h \
-    thread.h
+    thread.h \
+    videooutput.h

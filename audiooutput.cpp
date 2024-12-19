@@ -113,7 +113,7 @@ int AudioOutput::Init()
     wanted_spec.silence = 0;
     wanted_spec.callback = fill_audio_pcm;
     wanted_spec.userdata = this;
-    wanted_spec.samples = src_tgt_.frame_Size;// 采样数量
+    wanted_spec.samples = src_tgt_.frame_size;// 采样数量
 
     int ret = SDL_OpenAudio(&wanted_spec,&spec);
     if(ret < 0 ){
@@ -125,7 +125,7 @@ int AudioOutput::Init()
     dst_tgt_.fmt = AV_SAMPLE_FMT_S16;
     dst_tgt_.freq = spec.freq;
     dst_tgt_.channel_layout = av_get_default_channel_layout(src_tgt_.channels);
-    dst_tgt_.frame_Size = src_tgt_.frame_Size;
+    dst_tgt_.frame_size = src_tgt_.frame_size;
     SDL_PauseAudio(0);
     LogInfo("AudioOutput::Init() leave");
 }

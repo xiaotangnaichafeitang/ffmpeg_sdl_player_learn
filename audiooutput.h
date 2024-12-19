@@ -34,7 +34,7 @@ typedef struct AudioParams
     int channels;
     int64_t channel_layout;
     enum AVSampleFormat fmt;
-    int frame_Size;
+    int frame_size;
 }AudioParams;
 
 class AudioOutput
@@ -44,10 +44,10 @@ public:
     ~AudioOutput();
     int Init();
     int DeInit();
-private:
+public:
     AudioParams src_tgt_; //解码后的参数
     AudioParams dst_tgt_; // SDL实际输出的格式
-    AVFrameQueue *frame_queue_;
+    AVFrameQueue *frame_queue_ = NULL;
 
     struct SwrContext *swr_ctx_ = NULL;
 

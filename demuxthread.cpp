@@ -98,7 +98,8 @@ void DemuxThread::Run()
             ret = audio_queue_->Push(&pkt);
             LogInfo("audio pkt queue size:%d", audio_queue_->Size());
         } else if(pkt.stream_index == video_index_) {
-            ret = video_queue_->Push(&pkt);
+            // ret = video_queue_->Push(&pkt);
+            av_packet_unref(&pkt);
             LogInfo("video pkt queue size:%d", video_queue_->Size());
         } else {
             av_packet_unref(&pkt);

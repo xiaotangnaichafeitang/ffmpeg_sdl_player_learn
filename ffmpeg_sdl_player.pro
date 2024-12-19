@@ -2,6 +2,9 @@ TEMPLATE = app
 CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
+CONFIG -= gui
+
+QMAKE_LFLAGS += -mconsole
 
 SOURCES += \
         audiooutput.cpp \

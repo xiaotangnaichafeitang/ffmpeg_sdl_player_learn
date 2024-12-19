@@ -14,10 +14,15 @@
 #include "demuxthread.h"
 #include "avframequeue.h"
 #include "decodethread.h"
-using namespace std;
+#include "audiooutput.h"
 
+
+
+using namespace std;
+#undef main
 int main(int argc, char *argv[])
 {
+
     int ret = 0;
     cout << "Hello World!" << endl;
     LogInit();
@@ -69,8 +74,25 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    // 休眠2秒
-    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+    AudioParams audio_params = {0};
+    memset(&audio_params, 0, sizeof(AudioParams));
+    audio_params.channels = demux_thread->AudioCodecParameters()->channels;
+    audio_params.channel_layout = demux_thread->AudioCodecParameters()->channel_layout;
+    audio_params.fmt = (enum AVSampleFormat) demux_thread->AudioCodecParameters()->format;
+    audio_params.freq = demux_thread->AudioCodecParameters()->sample_rate;
+    audio_params.frame_size =demux_thread->AudioCodecParameters()->frame_size;
+
+    AudioOutput *audio_output = new AudioOutput(audio_params, &audio_frame_queue);
+
+    ret = audio_output->Init();
+    if(ret < 0){
+        LogError("audio_output->Init() dailed");
+        return -1;
+    }
+
+
+    // 休眠120秒
+    std::this_thread::sleep_for(std::chrono::milliseconds(120*1000));
 
     LogInfo("demux_thread->Stop");
     demux_thread->Stop();

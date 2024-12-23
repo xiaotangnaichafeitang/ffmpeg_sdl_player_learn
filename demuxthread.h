@@ -37,6 +37,9 @@ public:
     AVCodecParameters *AudioCodecParameters();
     AVCodecParameters *VideoCodecParameters();
 
+    AVRational AudioStreamTimebase();
+    AVRational VideoStreamTimebase();
+
 private:
     char err2str[256] = {0};
     std::string url_;//文件名

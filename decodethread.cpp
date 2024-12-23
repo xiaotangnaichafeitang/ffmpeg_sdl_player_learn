@@ -47,9 +47,15 @@ int DecodeThread::Init(AVCodecParameters *par)
         LogError("avcodec_parameters_to_context failed, ret:%d, err2str:%s", ret, err2str);
         return -1;
     }
-
-    AVCodec *codec = avcodec_find_decoder(codec_ctx_->codec_id);
-    if(!codec){
+    // h264
+    // h264_qsv  AV_CODEC_ID_H264
+//    avcodec_find_decoder_by_name()
+    AVCodec *codec;
+    if(AV_CODEC_ID_H264 == codec_ctx_->codec_id)
+        codec = avcodec_find_decoder_by_name("h264_qsv");
+    else
+        codec = avcodec_find_decoder(codec_ctx_->codec_id); //作业： 硬件解码
+    if(!codec) {
         LogError("avcodec_find_decoder failed");
         return -1;
     }

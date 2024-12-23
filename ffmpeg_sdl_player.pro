@@ -37,6 +37,7 @@ HEADERS += \
     audiooutput.h \
     avframequeue.h \
     avpacketqueue.h \
+    avsync.h \
     decodethread.h \
     demuxthread.h \
     log.h \

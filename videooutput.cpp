@@ -2,8 +2,8 @@
 #include "log.h"
 #include <thread>
 
-VideoOutput::VideoOutput(AVFrameQueue *frame_queue, int video_width, int video_height)
-    :frame_queue_(frame_queue), video_width_(video_width), video_height_(video_height)
+VideoOutput::VideoOutput(AVSync *avsync,AVRational time_base,AVFrameQueue *frame_queue, int video_width, int video_height)
+    :avsync_(avsync),time_base_(time_base),frame_queue_(frame_queue), video_width_(video_width), video_height_(video_height)
 {
 
 }
@@ -11,7 +11,8 @@ VideoOutput::VideoOutput(AVFrameQueue *frame_queue, int video_width, int video_h
 int VideoOutput::Init()
 {
 
-    if(SDL_INIT_VIDEO){
+    // if(SDL_INIT_VIDEO){
+    if(SDL_Init(SDL_INIT_VIDEO))  {
         LogError("SDL_Init failed");
         return -1;
     }
@@ -86,6 +87,16 @@ void VideoOutput::videoRefresh(double *remaining_time)
     AVFrame *frame = NULL;
     frame = frame_queue_->Front();
     if(frame){
+        double pts = frame->pts * av_q2d(time_base_);
+        LogInfo("video pts:%0.3lf\n",pts);
+        double diff = pts - avsync_->GetClock();
+
+        if (diff > 0 ){
+            *remaining_time = FFMIN(*remaining_time,diff);
+            return;
+        }
+
+
         rect_.x = 0;
         rect_.y = 0;
         rect_.w = video_width_;

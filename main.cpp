@@ -15,6 +15,7 @@
 #include "avframequeue.h"
 #include "decodethread.h"
 #include "audiooutput.h"
+#include "videooutput.h"
 
 
 
@@ -32,6 +33,9 @@ int main(int argc, char *argv[])
 
     AVFrameQueue audio_frame_queue;
     AVFrameQueue video_frame_queue;
+
+    AVSync avsync;
+    avsync.InitClock();
 
     //1 .解复用
     DemuxThread *demux_thread = new DemuxThread(&audio_packet_queue, &video_packet_queue);
@@ -82,14 +86,23 @@ int main(int argc, char *argv[])
     audio_params.freq = demux_thread->AudioCodecParameters()->sample_rate;
     audio_params.frame_size =demux_thread->AudioCodecParameters()->frame_size;
 
-    AudioOutput *audio_output = new AudioOutput(audio_params, &audio_frame_queue);
+    AudioOutput *audio_output = new AudioOutput(&avsync,demux_thread->AudioStreamTimebase(),audio_params, &audio_frame_queue);
 
     ret = audio_output->Init();
-    if(ret < 0){
-        LogError("audio_output->Init() dailed");
+    if(ret < 0) {
+        LogError("audio_output->Init() failed");
         return -1;
     }
 
+    VideoOutput *video_output = new VideoOutput(&avsync,demux_thread->VideoStreamTimebase(),&video_frame_queue, demux_thread->VideoCodecParameters()->width,
+                                                demux_thread->VideoCodecParameters()->height);
+
+    ret = video_output->Init();
+    if(ret < 0) {
+        LogError("video_output->Init() failed");
+        return -1;
+    }
+    video_output->MainLoop();
 
     // 休眠120秒
     std::this_thread::sleep_for(std::chrono::milliseconds(120*1000));

@@ -28,6 +28,8 @@ extern "C"
 
 
 #include "avframequeue.h"
+#include "avsync.h"
+
 typedef struct AudioParams
 {
     int freq;//采样率
@@ -40,16 +42,20 @@ typedef struct AudioParams
 class AudioOutput
 {
 public:
-    AudioOutput(const AudioParams &audio_params,AVFrameQueue *frame_queue);
+    AudioOutput(AVSync *avsync,AVRational time_base,const AudioParams &audio_params,AVFrameQueue *frame_queue);
     ~AudioOutput();
     int Init();
     int DeInit();
 public:
+    int64_t pts = AV_NOPTS_VALUE;
     AudioParams src_tgt_; //解码后的参数
     AudioParams dst_tgt_; // SDL实际输出的格式
     AVFrameQueue *frame_queue_ = NULL;
 
     struct SwrContext *swr_ctx_ = NULL;
+    AVSync *avsync_ = NULL;
+    AVRational time_base_;
+
 
     uint8_t *audio_buf_ = NULL;
     uint8_t *audio_buf1_ = NULL;

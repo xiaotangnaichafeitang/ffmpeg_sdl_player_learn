@@ -18,15 +18,17 @@ extern "C"
 // 包含ffmpeg头文件
 //#include "libavutil/avutil.h"
 #include "SDL.h"
+#include "libavutil/time.h"
 }
 #endif
 
 #include "avframequeue.h"
+#include "avsync.h"
 
 class VideoOutput
 {
 public:
-    VideoOutput(AVFrameQueue *frame_queue, int video_width, int video_height);
+    VideoOutput(AVSync *avsync,AVRational time_base,AVFrameQueue *frame_queue, int video_width, int video_height);
     ~VideoOutput();
     int Init();
     int MainLoop();
@@ -39,6 +41,9 @@ private:
     SDL_Window *win_ = NULL;
     SDL_Renderer *renderer_ = NULL;
     SDL_Texture *texture_ = NULL;
+
+    AVSync *avsync_ = NULL;
+    AVRational time_base_;
 
     int video_width_ = 0;
     int video_height_ = 0;

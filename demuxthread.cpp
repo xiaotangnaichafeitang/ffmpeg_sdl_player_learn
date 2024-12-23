@@ -98,8 +98,8 @@ void DemuxThread::Run()
             ret = audio_queue_->Push(&pkt);
             LogInfo("audio pkt queue size:%d", audio_queue_->Size());
         } else if(pkt.stream_index == video_index_) {
-            // ret = video_queue_->Push(&pkt);
-            av_packet_unref(&pkt);
+            ret = video_queue_->Push(&pkt);
+            // av_packet_unref(&pkt);
             LogInfo("video pkt queue size:%d", video_queue_->Size());
         } else {
             av_packet_unref(&pkt);
@@ -123,5 +123,24 @@ AVCodecParameters *DemuxThread::VideoCodecParameters()
        return ifmt_ctx_->streams[video_index_]->codecpar;
     }else{
         return NULL;
+    }
+}
+
+AVRational DemuxThread::AudioStreamTimebase()
+{
+    if(audio_index_ != -1) {
+        return ifmt_ctx_->streams[audio_index_]->time_base;
+    } else {
+        return AVRational{0, 0};
+    }
+
+}
+
+AVRational DemuxThread::VideoStreamTimebase()
+{
+    if(video_index_ != -1){
+        return ifmt_ctx_->streams[video_index_]->time_base;
+    }else{
+        return AVRational{0,0};
     }
 }
